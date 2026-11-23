@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendWise — Gestion de budget</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">S</div><span>SpendWise</span></div>
+    <div class="nav-label">MENU PRINCIPAL</div>
+    <nav>
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span> Tableau de bord</button>
+      <button class="nav-item" data-page="transactions"><span class="nav-icon">↕</span> Transactions</button>
+      <button class="nav-item" data-page="budgets"><span class="nav-icon">◉</span> Budgets</button>
+      <button class="nav-item" data-page="statistics"><span class="nav-icon">▥</span> Statistiques</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> Paramètres</button>
+      <div class="sidebar-note"><div class="note-icon">✦</div><b>Maîtrise tes finances</b><p>Chaque petit suivi compte pour atteindre tes objectifs.</p></div>
+      <div class="profile"><div class="avatar">U</div><div><b>Mon espace</b><small>Compte personnel</small></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu">☰</button>
+      <div class="top-title"><div id="pageEyebrow">VUE D'ENSEMBLE</div><h1 id="pageTitle">Tableau de bord</h1></div>
+      <div class="top-actions"><button class="icon-btn" id="themeToggle" title="Changer de thème">☾</button><button class="primary-btn" id="quickAdd">＋ Nouvelle transaction</button></div>
+    </header>
+
+    <section class="page active" id="dashboard">
+      <div class="welcome-row"><div><h2>Bonjour 👋</h2><p>Voici un aperçu de tes finances ce mois-ci.</p></div><div class="month-control"><button id="prevMonth">‹</button><span id="monthLabel"></span><button id="nextMonth">›</button></div></div>
+      <div class="summary-grid">
+        <article class="summary-card balance-card"><div class="card-top"><span>Solde du mois</span><span class="card-symbol">↗</span></div><h2 id="balanceValue">0 €</h2><div class="card-foot"><span id="balanceCaption">Revenus − dépenses</span></div></article>
+        <article class="summary-card"><div class="card-top"><span>Revenus</span><span class="symbol income-symbol">＋</span></div><h2 id="incomeValue">0 €</h2><div class="card-foot"><span class="positive">●</span> Ce mois-ci</div></article>
+        <article class="summary-card"><div class="card-top"><span>Dépenses</span><span class="symbol expense-symbol">−</span></div><h2 id="expenseValue">0 €</h2><div class="card-foot"><span class="muted">●</span> Ce mois-ci</div></article>
+        <article class="summary-card"><div class="card-top"><span>Budget restant</span><span class="symbol budget-symbol">◉</span></div><h2 id="remainingValue">0 €</h2><div class="card-foot" id="budgetCaption">Budget mensuel</div></article>
+      </div>
+      <div class="dashboard-grid">
+        <article class="panel budget-panel"><div class="panel-head"><div><h3>Budget mensuel</h3><p>Suivi de tes dépenses</p></div><button class="text-btn" data-goto="budgets">Voir le budget ↗</button></div><div class="budget-numbers"><strong id="budgetSpent">0 €</strong><span>sur <b id="budgetTotal">0 €</b></span></div><div class="progress-track"><div class="progress-fill" id="budgetProgress"></div></div><div class="budget-status" id="budgetStatus">Définis ton budget pour commencer.</div><div class="budget-mini"><div><span>Utilisé</span><b id="budgetPercent">0%</b></div><div><span>Disponible</span><b id="budgetAvailable">0 €</b></div></div></article>
+        <article class="panel chart-panel"><div class="panel-head"><div><h3>Dépenses par catégorie</h3><p>Répartition de ce mois</p></div><select id="categoryChartPeriod"><option value="month">Ce mois</option><option value="all">Toutes les données</option></select></div><div class="chart-wrap"><canvas id="categoryChart"></canvas><div id="chartEmpty" class="chart-empty">Ajoute des dépenses pour voir la répartition.</div></div></article>
+      </div>
+      <article class="panel transactions-panel"><div class="panel-head"><div><h3>Transactions récentes</h3><p>Les dernières opérations enregistrées</p></div><button class="text-btn" data-goto="transactions">Tout voir ↗</button></div><div id="recentTransactions"></div></article>
+    </section>
+
+    <section class="page" id="transactions">
+      <div class="page-intro"><div><h2>Toutes les transactions</h2><p>Consulte et gère tes revenus et dépenses.</p></div><button class="primary-btn" id="addTransactionBtn">＋ Ajouter</button></div>
+      <div class="panel filters-panel"><div class="search-box"><span>⌕</span><input id="searchInput" placeholder="Rechercher une transaction…"></div><select id="typeFilter"><option value="all">Tous les types</option><option value="expense">Dépenses</option><option value="income">Revenus</option></select><select id="categoryFilter"><option value="all">Toutes les catégories</option></select><input type="month" id="monthFilter"></div>
+      <div class="panel"><div id="allTransactions"></div></div>
+    </section>
+
+    <section class="page" id="budgets">
+      <div class="page-intro"><div><h2>Mes budgets</h2><p>Fixe tes limites et garde le contrôle.</p></div></div>
+      <article class="panel budget-settings"><div class="panel-head"><div><h3>Budget global mensuel</h3><p>La limite totale que tu souhaites respecter</p></div></div><form id="globalBudgetForm" class="budget-form"><label>Montant du budget <div class="input-money"><input type="number" min="0" step="0.01" id="globalBudgetInput" placeholder="Ex. 800"><span id="currencySuffix">€</span></div></label><button class="primary-btn">Enregistrer le budget</button></form></article>
+      <article class="panel"><div class="panel-head"><div><h3>Budgets par catégorie</h3><p>Définis une limite pour chaque catégorie de dépenses.</p></div></div><div id="categoryBudgets"></div></article>
+    </section>
+
+    <section class="page" id="statistics">
+      <div class="page-intro"><div><h2>Statistiques</h2><p>Comprends où va ton argent.</p></div><select id="statsPeriod"><option value="6">6 derniers mois</option><option value="12">12 derniers mois</option></select></div>
+      <div class="summary-grid stats-summary"><article class="summary-card"><div class="card-top"><span>Plus grande dépense</span><span class="symbol expense-symbol">↗</span></div><h2 id="biggestExpense">—</h2><div class="card-foot" id="biggestExpenseName">Aucune dépense</div></article><article class="summary-card"><div class="card-top"><span>Moyenne quotidienne</span><span class="symbol budget-symbol">◷</span></div><h2 id="dailyAverage">0 €</h2><div class="card-foot">Dépenses du mois en cours</div></article><article class="summary-card"><div class="card-top"><span>Catégorie principale</span><span class="symbol income-symbol">★</span></div><h2 id="topCategory">—</h2><div class="card-foot" id="topCategoryAmount">Pas encore de données</div></article></div>
+      <div class="dashboard-grid"><article class="panel"><div class="panel-head"><div><h3>Revenus et dépenses</h3><p>Comparaison mensuelle</p></div></div><div class="chart-wrap tall"><canvas id="monthlyChart"></canvas></div></article><article class="panel"><div class="panel-head"><div><h3>Répartition des dépenses</h3><p>Par catégorie</p></div></div><div class="chart-wrap tall"><canvas id="statsCategoryChart"></canvas></div></article></div>
+    </section>
+
+    <section class="page" id="settings">
+      <div class="page-intro"><div><h2>Paramètres</h2><p>Personnalise SpendWise selon tes préférences.</p></div></div>
+      <article class="panel settings-card"><h3>Préférences générales</h3><div class="setting-row"><div><b>Devise</b><p>Choisis la devise utilisée dans l'application.</p></div><select id="currencySelect"><option value="EUR">EUR — Euro (€)</option><option value="USD">USD — Dollar ($)</option><option value="XPF">XPF — Franc CFP (F)</option><option value="GBP">GBP — Livre (£)</option><option value="CAD">CAD — Dollar canadien ($)</option></select></div><div class="setting-row"><div><b>Apparence</b><p>Activer le thème sombre ou clair.</p></div><button class="secondary-btn" id="settingsTheme">Basculer le thème</button></div></article>
+      <article class="panel settings-card"><h3>Données</h3><div class="setting-row"><div><b>Exporter mes transactions</b><p>Télécharger tes transactions au format CSV.</p></div><button class="secondary-btn" id="exportCsv">Exporter CSV</button></div><div class="setting-row"><div><b>Réinitialiser les données</b><p>Supprimer toutes les transactions et budgets sauvegardés.</p></div><button class="danger-btn" id="resetData">Réinitialiser</button></div></article><article class="panel settings-card about"><div class="brand"><div class="brand-mark">S</div><span>SpendWise</span></div><p>Gestion simple et sereine de tes finances personnelles.</p><small>Version 1.0 • Données stockées localement dans ton navigateur.</small></article>
+    </section>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-head"><div><h2 id="modalTitle">Nouvelle transaction</h2><p>Renseigne les détails de ton opération.</p></div><button class="icon-btn" id="closeModal">×</button></div>
+    <form id="transactionForm">
+      <input type="hidden" id="transactionId">
+      <div class="type-toggle"><button type="button" class="selected expense-type" data-type="expense">Dépense</button><button type="button" class="income-type" data-type="income">Revenu</button></div>
+      <label>Montant <div class="input-money"><input type="number" id="amount" min="0.01" step="0.01" required placeholder="0.00"><span class="currencyMark">€</span></div></label>
+      <label>Description<input id="description" required maxlength="80" placeholder="Ex. Courses du marché"></label>
+      <div class="form-row"><label>Catégorie<select id="transactionCategory" required></select></label><label>Date<input type="date" id="transactionDate" required></label></div>
+      <label>Note (facultative)<textarea id="note" rows="2" placeholder="Ajouter un détail…"></textarea></label>
+      <div class="modal-actions"><button type="button" class="secondary-btn" id="cancelModal">Annuler</button><button type="submit" class="primary-btn">Enregistrer</button></div>
+    </form>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
